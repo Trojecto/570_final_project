@@ -1,4 +1,5 @@
 import os
+import sys
 
 
 def generate_string(base, idxs):
@@ -27,11 +28,12 @@ def generate_string(base, idxs):
 # moving into the SampleTestCases
 os.chdir("SampleTestCases")
 
-# take file name as input
-filename = input("Enter the input file name: ")
+# parse command line args
+input_file = sys.argv[1]
+output_file = sys.argv[2]
 
 # parse input file
-with open(filename, "r") as myfile:
+with open(input_file, "r") as myfile:
     data = myfile.read().splitlines()
 
 generated_strings = []
