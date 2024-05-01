@@ -24,8 +24,8 @@ def process_memory():
 def time_wrapper():
     start_time = time.time()
     min_seq_align_val = start_dp()
-    print(f"Min seq align value (classic DP): {min_seq_align_val}")
     end_time = time.time()
+    print(f"Min seq align value (classic DP): {min_seq_align_val}")
     time_taken = (end_time - start_time)*1000
     return time_taken
 
