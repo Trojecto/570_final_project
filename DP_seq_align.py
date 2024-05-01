@@ -57,41 +57,6 @@ def get_alpha(x: str, y: str):
     return ALPHA[idxs[x]][idxs[y]]
 
 
-def get_minimum_penalty(x: str, y: str):
-    """
-    Find Minimum Penalty
-    X: First string from the input file arguments
-    Y: Second string from the input file argument
-    """
-
-    # Initialize variables
-    i = 0
-    j = 0
-
-    # Pattern lengths
-    xlen = len(x)
-    ylen = len(y)
-
-    # Dynamic Programing Table Setup
-    dp_table = np.zeros([xlen + 1, ylen + 1], dtype=int)
-
-    dp_table[0: (xlen + 1), 0] = [i * DELTA for i in range(xlen + 1)]
-    dp_table[0, 0: (ylen + 1)] = [i * DELTA for i in range(ylen + 1)]
-
-    # Calculate Minimum Penalty
-    i = 1
-    while i <= xlen:
-        j = 1
-        while j <= ylen:
-
-            # apply the recurrence relation from classic DP leture (lecture 8)
-            dp_table[i][j] = min(dp_table[i - 1][j - 1] + get_alpha(x[i - 1], y[j - 1]),
-                                 dp_table[i - 1][j] + DELTA, dp_table[i][j - 1] + DELTA)
-
-            j += 1
-        i += 1
-
-
 def start_dp():
     # TODO before submitting double check if we need to ever test with some other directory instead
     # moving into the SampleTestCases
@@ -141,18 +106,11 @@ def get_alpha(x: str, y: str):
 
 def get_minimum_penalty(x: str, y: str):
     """
-    Find Minimum Penalty
-    X: X in PDF
-    Y: Y in PDF
-    alpha: mismatch penalty
-    delta: gap penalty
+    X: First string from input arguments
+    Y: Second string from input arguments
     """
-
-    # Initialize variables
     i = 0
     j = 0
-
-    # Pattern lengths
     xlen = len(x)
     ylen = len(y)
 
@@ -167,13 +125,23 @@ def get_minimum_penalty(x: str, y: str):
     while i <= xlen:
         j = 1
         while j <= ylen:
-
             # apply the recurrence relation from classic DP leture (lecture 8)
             dp_table[i][j] = min(dp_table[i - 1][j - 1] + get_alpha(x[i - 1], y[j - 1]),
                                  dp_table[i - 1][j] + DELTA, dp_table[i][j - 1] + DELTA)
 
             j += 1
         i += 1
+
+    # find the first and second string alignments by reverse engineering the DP optimal result
+    max_len = xlen + ylen
+    i = xlen
+    j = ylen
+
+    # NOTE that these are temporary 
+    xpos, ypos = max_len, max_len
+    x_align, y_align = np.zeros()
+
+
 
     # NOTE that we aren't using 0 indexing here because we added a 1-layer padding to the dp_table
     return dp_table[xlen][ylen]
