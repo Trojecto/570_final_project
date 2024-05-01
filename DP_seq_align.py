@@ -60,10 +60,8 @@ def get_alpha(x: str, y: str):
 def get_minimum_penalty(x: str, y: str):
     """
     Find Minimum Penalty
-    X: X in PDF
-    Y: Y in PDF
-    alpha: mismatch penalty
-    delta: gap penalty
+    X: First string from the input file arguments
+    Y: Second string from the input file argument
     """
 
     # Initialize variables
