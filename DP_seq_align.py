@@ -140,32 +140,32 @@ def get_minimum_penalty(x: str, y: str):
     # NOTE that these are temporary positions for the current index that we are trying to figure out
     x_pos, y_pos = max_len, max_len
     # create the arrays to store the final aligned strings for x (s1) and y (s2)
-    x_aligned, y_aligned = np.empty(
-        max_len + 1, dtype='c'), np.empty(max_len + 1, dtype='c')
+    x_aligned, y_aligned = np.zeros(
+        max_len + 1, dtype=int), np.zeros(max_len + 1, dtype=int)
 
     # go through the dp_table (using the 4 cases for which we can reconstruct the string: 1. chars match 2. paying delta cost 3. paying gap cost for s1 4. paying gap cost for s2)
     while i != 0 and j != 0:
         # case 1: chars match
         if x[i - 1] == y[j - 1]:
-            x_aligned[x_pos] = x[i - 1]
-            y_aligned[y_pos] = y[j - 1]
+            x_aligned[x_pos] = ord(x[i - 1])
+            y_aligned[y_pos] = ord(y[j - 1])
             i -= 1
             j -= 1
         # case 2: paying the delta cost for mismatch chars
         elif dp_table[i - 1][j - 1] + get_alpha(x[i - 1], y[j - 1]) == dp_table[i][j]:
-            x_aligned[x_pos] = x[i - 1]
-            y_aligned[y_pos] = y[j - 1]
+            x_aligned[x_pos] = ord(x[i - 1])
+            y_aligned[y_pos] = ord(y[j - 1])
             i -= 1
             j -= 1
         # case 3: paying the alpha cost for x
         elif dp_table[i][j - 1] + DELTA == dp_table[i][j]:
-            x_aligned[x_pos] = '_'
-            y_aligned[y_pos] = y[j - 1]
+            x_aligned[x_pos] = ord('_')
+            y_aligned[y_pos] = ord(y[j - 1])
             j -= 1
         # case 4: paying the alpha cost for y
         elif dp_table[i - 1][j] + DELTA == dp_table[i][j]:
-            x_aligned[x_pos] = x[i - 1]
-            y_aligned[y_pos] = '_'
+            x_aligned[x_pos] = ord(x[i - 1])
+            y_aligned[y_pos] = ord('_')
             i -= 1
         # decrease the xpos and ypos for each iteration so that we get the current char for x and y
         x_pos -= 1
@@ -174,45 +174,43 @@ def get_minimum_penalty(x: str, y: str):
     # go through the rest of the string that hasn't been finished yet (since we assumed the answer for each string to be max_len)
     while x_pos > 0:
         if i > 0:
-            x_aligned[x_pos] = x[i]
+            x_aligned[x_pos] = ord(x[i])
             i -= 1
         else:
-            x_aligned[x_pos] = '_'
+            x_aligned[x_pos] = ord('_')
         # decrease xpos on each iteration
         x_pos -= 1
-    
+
     while y_pos > 0:
         if j > 0:
-            y_aligned[y_pos] = y[j]
+            y_aligned[y_pos] = ord(y[j])
             j -= 1
         else:
-            y_aligned[y_pos] = '_'
+            y_aligned[y_pos] = ord('_')
         y_pos -= 1
-    
+
     # remove the extra chars that we didn't use in the x_aligned and y_aligned
     starting_idx = 1  # represents the idx in which the string alignment answer starts at
     i = max_len
     while i >= 1:
         # in this case we have found the start of the junk chars
-        if x_aligned[i] == '_' and y_aligned[i] == '_':
+        if chr(x_aligned[i]) == '_' and chr(y_aligned[i]) == '_':
             starting_idx = i + 1
             break
         i -= 1
-    
+
     # print out the misaligned genes
     i = starting_idx
     x_final_sequence = ""
-    # TODO consider rewriting this using np index logic 
     while i <= max_len:
-        x_final_sequence += str(x_aligned[i])
+        x_final_sequence += chr(x_aligned[i])
         i += 1
     print(f"s1 aligned: {x_final_sequence}")
 
     i = starting_idx
     y_final_sequence = ""
-    # TODO consider rewriting this using np index logic 
     while i <= max_len:
-        y_final_sequence += str(y_aligned[i])
+        y_final_sequence += chr(y_aligned[i])
         i += 1
     print(f"s2 aligned: {y_final_sequence}")
 
