@@ -19,11 +19,20 @@ def process_memory():
 
 
 def time_wrapper():
+    output_file_name = sys.argv[2]
+    output_file = open(output_file_name, "w")
     start_time = time.time()
-    min_seq_align_val = start_dp()
+    min_seq_align_val, x_aligned, y_aligned = start_dp()
     end_time = time.time()
-    print(f"Min seq align value (classic DP): {min_seq_align_val}")
+    output_file.write(str(min_seq_align_val) + "\n")
+    output_file.write(x_aligned + "\n")
+    output_file.write(y_aligned + "\n")
+
     time_taken = (end_time - start_time)*1000
+
+    output_file.write(str(time_taken) + "\n")
+    memory_taken = process_memory()
+    output_file.write(str(memory_taken) + "\n")
     return time_taken
 
 
@@ -61,7 +70,7 @@ def start_dp():
 
     # parse command line args
     input_file = sys.argv[1]
-    output_file = sys.argv[2]
+    output_file_name = sys.argv[2]
 
     # parse input file
     with open(input_file, "r") as myfile:
@@ -198,22 +207,19 @@ def get_minimum_penalty(x: str, y: str):
     while i <= max_len:
         x_final_sequence += chr(x_aligned[i])
         i += 1
-    print(f"s1 aligned: {x_final_sequence}")
 
     j = starting_idx
     y_final_sequence = ""
     while j <= max_len:
         y_final_sequence += chr(y_aligned[j])
         j += 1
-    print(f"s2 aligned: {y_final_sequence}")
 
     # NOTE that we aren't using 0 indexing here because we added a 1-layer padding to the dp_table
-    return dp_table[xlen][ylen]
+    return dp_table[xlen][ylen], x_final_sequence, y_final_sequence
 
 
 def main():
-    print(f'Time taken: {time_wrapper()} miliseconds')
-    print(f'Memory taken: {process_memory()} kilobytes')
+    time_wrapper()
 
 
 if __name__ == '__main__':
