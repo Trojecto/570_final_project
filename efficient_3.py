@@ -104,7 +104,6 @@ def get_alpha(x: str, y: str):
     return ALPHA[idxs[x]][idxs[y]]
 
 
-
 def get_minimum_penalty(x: str, y: str):
     """
     X: First string from input arguments
@@ -173,18 +172,21 @@ def get_minimum_penalty(x: str, y: str):
         y_pos -= 1
 
     # go through the rest of the string that hasn't been finished yet (since we assumed the answer for each string to be max_len)
-    
+    while x_pos > 0:
+        if i > 0:
+            x_aligned[x_pos] = ord(x[i - 1])
+            i -= 1
+        else:
+            x_aligned[x_pos] = ord('_')
+        x_pos -= 1
 
-    while i != 0:
-        x_aligned[x_pos] = ord(x[i - 1])
-        y_aligned[y_pos] = ord('_')
-        i -= 1
-
-    while j != 0:
-        x_aligned[x_pos] = ord('_')
-        y_aligned[y_pos] = ord(y[j - 1])
-        j -= 1
-
+    while y_pos > 0:
+        if j > 0:
+            y_aligned[y_pos] = ord(y[j - 1])
+            j -= 1
+        else:
+            y_aligned[y_pos] = ord('_')
+        y_pos -= 1
 
     # remove the extra chars that we didn't use in the x_aligned and y_aligned
     starting_idx = 1  # represents the idx in which the string alignment answer starts at
@@ -204,19 +206,15 @@ def get_minimum_penalty(x: str, y: str):
         i += 1
     print(f"s1 aligned: {x_final_sequence}")
 
-    i = starting_idx
+    j = starting_idx
     y_final_sequence = ""
-    while i <= max_len:
-        y_final_sequence += chr(y_aligned[i])
-        i += 1
+    while j <= max_len:
+        y_final_sequence += chr(y_aligned[j])
+        j += 1
     print(f"s2 aligned: {y_final_sequence}")
-
-    print("S1 Aligned: ", x_final_sequence)
-    print("S2 Aligned: ", y_final_sequence)
 
     # NOTE that we aren't using 0 indexing here because we added a 1-layer padding to the dp_table
     return [x_final_sequence, y_final_sequence, dp_table[xlen][ylen]]
-
 
 
 def get_efficient_minimum_penalty(x: str, y: str, is_first: bool):
@@ -232,19 +230,16 @@ def get_efficient_minimum_penalty(x: str, y: str, is_first: bool):
     # initialize dp_table
     dp_table = np.zeros([2, ylen + 1], dtype=int)
 
-
     # filling delta values into first row
     for i in range(ylen + 1):
         dp_table[0][i] = DELTA * i
-
-
 
     # Flag: Checking if function is running on first half of sequence
     if is_first:
         for i in range(1, xlen + 1):
             dp_table[1][0] = i * DELTA
             for j in range(1, ylen + 1):
-                dp_table[1][j] = min(dp_table[0][j - 1] + get_alpha(x[i - 1], y[j - 1]), 
+                dp_table[1][j] = min(dp_table[0][j - 1] + get_alpha(x[i - 1], y[j - 1]),
                                      dp_table[0][j] + DELTA,
                                      dp_table[1][j - 1] + DELTA)
             for j in range(ylen + 1):
@@ -255,7 +250,7 @@ def get_efficient_minimum_penalty(x: str, y: str, is_first: bool):
         for i in range(1, xlen + 1):
             dp_table[1][0] = i * DELTA
             for j in range(1, ylen + 1):
-                dp_table[1][j] = min(dp_table[0][j - 1] + get_alpha(x[xlen - i], y[ylen - j]), 
+                dp_table[1][j] = min(dp_table[0][j - 1] + get_alpha(x[xlen - i], y[ylen - j]),
                                      dp_table[0][j] + DELTA,
                                      dp_table[1][j - 1] + DELTA)
 
@@ -276,7 +271,6 @@ def divide_and_conquer(x: str, y: str):
     xlen = len(x)
     ylen = len(y)
 
-
     xfirst = x[:xlen//2]
     xlast = x[xlen//2:]
 
@@ -289,7 +283,7 @@ def divide_and_conquer(x: str, y: str):
     # recurrence case once x or y goes down to length 0 or 1
     # print("X Length: ", xlen)
     # print("Y Length: ", ylen)
-    
+
     if xlen < 2 or ylen < 2:
         return get_minimum_penalty(x, y)
 
@@ -299,7 +293,8 @@ def divide_and_conquer(x: str, y: str):
         last_half = get_efficient_minimum_penalty(xlast, y, False)
 
         # finding ideal split point for string y
-        efficient_penalty = [first_half[i] + last_half[ylen - i] for i in range(ylen + 1)]
+        efficient_penalty = [first_half[i] + last_half[ylen - i]
+                             for i in range(ylen + 1)]
         print("Efficient String: ", efficient_penalty)
         ysplit = efficient_penalty.index(min(efficient_penalty))
         print("Y Split: ", ysplit)
@@ -312,36 +307,31 @@ def divide_and_conquer(x: str, y: str):
         get_first = divide_and_conquer(x[:xlen//2], y[:ysplit])
         get_last = divide_and_conquer(x[xlen//2:], y[ysplit:])
 
-
-        
         # Currently trying to clean out \x00 in the lines below
-        
 
         print(get_first[0])
         print("Get First 0 0: ", get_first[0])
         print("Get First 0 1: ", get_first[1])
-        get_first[0].replace('\x00','')
-        get_first[1].replace('\x00','')
-            
+        get_first[0].replace('\x00', '')
+        get_first[1].replace('\x00', '')
 
-        get_last[0].replace('\x00','')
-        get_last[1].replace('\x00','')
+        get_last[0].replace('\x00', '')
+        get_last[1].replace('\x00', '')
 
         clean_get_first = []
         for i in get_first:
             clean_get_first_new = []
             if (isinstance(i, str)):
                 for j in i:
-                    clean_get_first_new.append(j.replace('\x00',''))
+                    clean_get_first_new.append(j.replace('\x00', ''))
             clean_get_first.append(clean_get_first_new)
-
 
         clean_get_last = []
         for i in get_last:
             clean_get_last_new = []
             if (isinstance(i, str)):
                 for j in i:
-                    clean_get_last_new.append(j.replace('\x00',''))
+                    clean_get_last_new.append(j.replace('\x00', ''))
             clean_get_last.append(clean_get_last_new)
 
         # Trying to clean out \x00 until this point
@@ -349,9 +339,9 @@ def divide_and_conquer(x: str, y: str):
         print("First Half: ", clean_get_first)
         print("Last Half: ", clean_get_last)
 
-    return[get_first[j] + get_last[j] for j in range(3)]
+    return [get_first[j] + get_last[j] for j in range(3)]
 
-    
+
 def main():
     divide_and_conquer_result = time_wrapper()
     memory_value = process_memory()
@@ -360,10 +350,8 @@ def main():
     print(f'Time taken: {time_value} miliseconds')
     print(f'Memory taken: {memory_value} kilobytes')
 
-
-
     # Write to File
-    f = open("output.txt",'w')
+    f = open("output.txt", 'w')
     f.write(str(dandc_value[0]))
     f.write('\n')
     f.write(str(dandc_value[1]))
