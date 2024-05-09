@@ -178,7 +178,6 @@ def get_minimum_penalty(x: str, y: str):
             i -= 1
         else:
             x_aligned[x_pos] = ord('_')
-        # decrease xpos on each iteration
         x_pos -= 1
 
     while y_pos > 0:
@@ -207,11 +206,11 @@ def get_minimum_penalty(x: str, y: str):
         i += 1
     print(f"s1 aligned: {x_final_sequence}")
 
-    i = starting_idx
+    j = starting_idx
     y_final_sequence = ""
-    while i <= max_len:
-        y_final_sequence += chr(y_aligned[i])
-        i += 1
+    while j <= max_len:
+        y_final_sequence += chr(y_aligned[j])
+        j += 1
     print(f"s2 aligned: {y_final_sequence}")
 
     # NOTE that we aren't using 0 indexing here because we added a 1-layer padding to the dp_table
