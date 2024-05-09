@@ -1,4 +1,3 @@
-import numpy as np
 import os
 import sys
 from resource import *
@@ -7,10 +6,8 @@ import psutil
 
 
 # create the hardcoded alpha and delta table
-alpha_data = [[0, 110, 48, 94], [110, 0, 118, 48],
-              [48, 118, 0, 110], [94, 48, 110, 0]]
-
-ALPHA = np.array(alpha_data)
+ALPHA = [[0, 110, 48, 94], [110, 0, 118, 48],
+         [48, 118, 0, 110], [94, 48, 110, 0]]
 DELTA = 30
 
 
@@ -91,14 +88,6 @@ def start_dp():
     return divide_and_conquer(generated_strings[0], generated_strings[1])
 
 
-# create the hardcoded alpha and delta table
-alpha_data = [[0, 110, 48, 94], [110, 0, 118, 48],
-              [48, 118, 0, 110], [94, 48, 110, 0]]
-
-ALPHA = np.array(alpha_data)
-DELTA = 30
-
-
 def get_alpha(x: str, y: str):
     idxs = {'A': 0, 'C': 1, 'G': 2, 'T': 3}
     return ALPHA[idxs[x]][idxs[y]]
@@ -115,10 +104,18 @@ def get_minimum_penalty(x: str, y: str):
     ylen = len(y)
 
     # Dynamic Programing Table Setup
-    dp_table = np.zeros([xlen + 1, ylen + 1], dtype=int)
+    dp_table = []
 
-    dp_table[0: (xlen + 1), 0] = [i * DELTA for i in range(xlen + 1)]
-    dp_table[0, 0: (ylen + 1)] = [i * DELTA for i in range(ylen + 1)]
+    # Iterate through rows and columns to create a list of lists
+    dp_table = [[0] * (ylen + 1) for _ in range(xlen + 1)]
+
+    # Fill the first row with multiples of DELTA
+    for i in range(xlen + 1):
+        dp_table[i][0] = i * DELTA
+
+    # Fill the first column with multiples of DELTA
+    for j in range(ylen + 1):
+        dp_table[0][j] = j * DELTA
 
     # Calculate Minimum Penalty
     i = 1
@@ -139,9 +136,9 @@ def get_minimum_penalty(x: str, y: str):
 
     # NOTE that these are temporary positions for the current index that we are trying to figure out
     x_pos, y_pos = max_len, max_len
-    # create the arrays to store the final aligned strings for x (s1) and y (s2)
-    x_aligned, y_aligned = np.zeros(
-        max_len + 1, dtype=int), np.zeros(max_len + 1, dtype=int)
+    # Create empty lists to store the aligned sequences
+    x_aligned = [0] * (max_len + 1)
+    y_aligned = [0] * (max_len + 1)
 
     # go through the dp_table (using the 4 cases for which we can reconstruct the string: 1. chars match 2. paying delta cost 3. paying gap cost for s1 4. paying gap cost for s2)
     while i != 0 and j != 0:
@@ -228,7 +225,7 @@ def get_efficient_minimum_penalty(x: str, y: str, is_first: bool):
     ylen = len(y)
 
     # initialize dp_table
-    dp_table = np.zeros([2, ylen + 1], dtype=int)
+    dp_table = [[0] * (ylen + 1) for _ in range(2)]
 
     # filling delta values into first row
     for i in range(ylen + 1):
