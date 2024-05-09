@@ -64,7 +64,6 @@ def get_alpha(x: str, y: str):
 
 
 def start_dp():
-    # TODO before submitting double check if we need to ever test with some other directory instead
     # moving into the SampleTestCases
     os.chdir("SampleTestCases")
 
