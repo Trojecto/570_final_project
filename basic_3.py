@@ -174,7 +174,7 @@ def get_minimum_penalty(x: str, y: str):
     # go through the rest of the string that hasn't been finished yet (since we assumed the answer for each string to be max_len)
     while x_pos > 0:
         if i > 0:
-            x_aligned[x_pos] = ord(x[i])
+            x_aligned[x_pos] = ord(x[i - 1])
             i -= 1
         else:
             x_aligned[x_pos] = ord('_')
@@ -182,7 +182,7 @@ def get_minimum_penalty(x: str, y: str):
 
     while y_pos > 0:
         if j > 0:
-            y_aligned[y_pos] = ord(y[j])
+            y_aligned[y_pos] = ord(y[j - 1])
             j -= 1
         else:
             y_aligned[y_pos] = ord('_')
