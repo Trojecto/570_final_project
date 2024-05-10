@@ -300,7 +300,7 @@ def main():
     dandc_value = divide_and_conquer_result[1]
 
     # Write to File
-    f = open("output.txt", 'w')
+    f = open(sys.argv[2], 'w')
     f.write(str(dandc_value[2]))
     f.write('\n')
     f.write(str(dandc_value[0]))
