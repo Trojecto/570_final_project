@@ -22,7 +22,6 @@ def time_wrapper():
     start_time = time.time()
     min_seq_align_val = start_dp()
     end_time = time.time()
-    print(f"Min seq align value (classic DP): {min_seq_align_val}")
     time_taken = (end_time - start_time)*1000
     return [time_taken, min_seq_align_val]
 
@@ -56,8 +55,8 @@ def get_alpha(x: str, y: str):
 
 def start_dp():
     # TODO before submitting double check if we need to ever test with some other directory instead
-    # moving into the SampleTestCases
-    os.chdir("SampleTestCases")
+    # moving into datapoints folder
+    os.chdir("datapoints")
 
     # parse command line args
     input_file = sys.argv[1]
@@ -98,8 +97,7 @@ def get_minimum_penalty(x: str, y: str):
     X: First string from input arguments
     Y: Second string from input arguments
     """
-    i = 0
-    j = 0
+    
     xlen = len(x)
     ylen = len(y)
 
@@ -110,12 +108,12 @@ def get_minimum_penalty(x: str, y: str):
     dp_table = [[0] * (ylen + 1) for _ in range(xlen + 1)]
 
     # Fill the first row with multiples of DELTA
-    for i in range(xlen + 1):
-        dp_table[i][0] = i * DELTA
+    for xid in range(xlen + 1):
+        dp_table[xid][0] = xid * DELTA
 
     # Fill the first column with multiples of DELTA
-    for j in range(ylen + 1):
-        dp_table[0][j] = j * DELTA
+    for yid in range(ylen + 1):
+        dp_table[0][yid] = yid * DELTA
 
     # Calculate Minimum Penalty
     i = 1
@@ -201,14 +199,12 @@ def get_minimum_penalty(x: str, y: str):
     while i <= max_len:
         x_final_sequence += chr(x_aligned[i])
         i += 1
-    print(f"s1 aligned: {x_final_sequence}")
 
     j = starting_idx
     y_final_sequence = ""
     while j <= max_len:
         y_final_sequence += chr(y_aligned[j])
         j += 1
-    print(f"s2 aligned: {y_final_sequence}")
 
     # NOTE that we aren't using 0 indexing here because we added a 1-layer padding to the dp_table
     return [x_final_sequence, y_final_sequence, dp_table[xlen][ylen]]
@@ -263,24 +259,19 @@ def divide_and_conquer(x: str, y: str):
     Y: Second string from input arguments
     """
 
-    # print("X String: " + x)
-    # print("Y String: " + y)
     xlen = len(x)
     ylen = len(y)
 
     xfirst = x[:xlen//2]
     xlast = x[xlen//2:]
 
-    # print("X First Half: " + xfirst)
-
-    # print("X Last Half: " + xlast)
 
     # divide and conquer algorithm
 
-    # recurrence case once x or y goes down to length 0 or 1
-    # print("X Length: ", xlen)
-    # print("Y Length: ", ylen)
 
+
+    # base case
+    
     if xlen < 2 or ylen < 2:
         return get_minimum_penalty(x, y)
 
@@ -289,52 +280,15 @@ def divide_and_conquer(x: str, y: str):
         first_half = get_efficient_minimum_penalty(xfirst, y, True)
         last_half = get_efficient_minimum_penalty(xlast, y, False)
 
-        # finding ideal split point for string y
+        
         efficient_penalty = [first_half[i] + last_half[ylen - i]
                              for i in range(ylen + 1)]
-        print("Efficient String: ", efficient_penalty)
+        
         ysplit = efficient_penalty.index(min(efficient_penalty))
-        print("Y Split: ", ysplit)
-
-        print("Y First Half: ", y[:ysplit])
-        print("Y Last Half: ", y[ysplit:])
-        print("Current First Half X: ", x[:xlen//2])
-        print("Current Last Half X: ", x[xlen//2:])
-        # recursion back into divide and conquer along half of x and y's ideal split
+        
         get_first = divide_and_conquer(x[:xlen//2], y[:ysplit])
         get_last = divide_and_conquer(x[xlen//2:], y[ysplit:])
 
-        # Currently trying to clean out \x00 in the lines below
-
-        print(get_first[0])
-        print("Get First 0 0: ", get_first[0])
-        print("Get First 0 1: ", get_first[1])
-        get_first[0].replace('\x00', '')
-        get_first[1].replace('\x00', '')
-
-        get_last[0].replace('\x00', '')
-        get_last[1].replace('\x00', '')
-
-        clean_get_first = []
-        for i in get_first:
-            clean_get_first_new = []
-            if (isinstance(i, str)):
-                for j in i:
-                    clean_get_first_new.append(j.replace('\x00', ''))
-            clean_get_first.append(clean_get_first_new)
-
-        clean_get_last = []
-        for i in get_last:
-            clean_get_last_new = []
-            if (isinstance(i, str)):
-                for j in i:
-                    clean_get_last_new.append(j.replace('\x00', ''))
-            clean_get_last.append(clean_get_last_new)
-
-        # Trying to clean out \x00 until this point
-
-        print("First Half: ", clean_get_first)
-        print("Last Half: ", clean_get_last)
 
     return [get_first[j] + get_last[j] for j in range(3)]
 
@@ -344,20 +298,18 @@ def main():
     memory_value = process_memory()
     time_value = divide_and_conquer_result[0]
     dandc_value = divide_and_conquer_result[1]
-    print(f'Time taken: {time_value} miliseconds')
-    print(f'Memory taken: {memory_value} kilobytes')
 
     # Write to File
     f = open("output.txt", 'w')
+    f.write(str(dandc_value[2]))
+    f.write('\n')
     f.write(str(dandc_value[0]))
     f.write('\n')
     f.write(str(dandc_value[1]))
     f.write('\n')
-    f.write(str(dandc_value[2]))
+    f.write(str(time_value))
     f.write('\n')
-    f.write("Time Taken: " + str(time_value))
-    f.write('\n')
-    f.write("Memory Taken: " + str(memory_value))
+    f.write(str(memory_value))
     f.close()
 
 

@@ -64,8 +64,8 @@ def get_alpha(x: str, y: str):
 
 
 def start_dp():
-    # moving into the SampleTestCases
-    os.chdir("SampleTestCases")
+    # moving into datapoints folder
+    os.chdir("datapoints")
 
     # parse command line args
     input_file = sys.argv[1]
